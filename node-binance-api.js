@@ -570,7 +570,19 @@ let api = function Binance( options = {} ) {
                         }
                         if ( !error && response.statusCode == 200 ) return resolve( JSONbig.parse( body ) );
                         if ( typeof response.body !== 'undefined' ) {
-                            return resolve( JSONbig.parse( response.body ) );
+                            const body = JSONbig.parse( response.body );
+
+                            if ( body.code ) {
+                                console.error(
+                                    `[API] [Endpoint: ${ response.request.url.pathname }] [Status: ${ response.statusCode } ${ response.statusMessage }]\n`,
+                                    `Error code: ${ body.code }\n`,
+                                    `Error message: ${ body.msg }\n`,
+                                    "Request data:", data
+                                )
+                                return reject( body );
+                            }
+
+                            return resolve( body );
                         }
                         return reject( response );
                     } catch ( err ) {
